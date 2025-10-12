@@ -60,7 +60,7 @@ Adding Terraform to your system's `PATH` allows you to run the `terraform` comma
 3. You should see output similar to:
 
    ```text
-   Terraform v1.5.0
+   Terraform v1.13.3
    ```
 
    This confirms that Terraform is installed and accessible from the command line.
@@ -125,7 +125,7 @@ With Homebrew installed, installing Terraform is straightforward.
    You should see output similar to:
 
    ```text
-   Terraform v1.5.0
+   Terraform v1.13.3
    ```
 
 ### Alternative Method: Manual Installation
@@ -164,17 +164,268 @@ terraform -v
 
 ---
 
-## 3. Next Steps
+## 3. Updating Terraform to the Latest Version
 
-With Terraform installed, you're ready to start defining and deploying infrastructure on Google Cloud Platform (GCP). Here are some suggestions for what to do next:
+Terraform regularly releases updates with new features, bug fixes, and security improvements. It's important to keep your Terraform installation up to date.
 
-- **Configure GCP Credentials**: Terraform will need access to your GCP credentials to manage resources.
-- **Install a Code Editor**: Tools like Visual Studio Code offer syntax highlighting and other features for Terraform files.
-- **Learn Terraform Basics**: Start with simple GCP configurations to get familiar with the syntax and workflow.
+### Checking Your Current Version
+
+First, check your current Terraform version:
+
+```shell
+terraform -version
+```
+
+If you see output like this, your Terraform is out of date:
+
+```text
+Terraform v1.9.8
+on darwin_arm64
+
+Your version of Terraform is out of date! The latest version
+is 1.13.3. You can update by downloading from https://www.terraform.io/downloads.html
+```
+
+### Updating Terraform on macOS
+
+#### Method 1: Using Homebrew (Recommended)
+
+If you installed Terraform using Homebrew, updating is simple:
+
+```shell
+brew update
+brew upgrade hashicorp/tap/terraform
+```
+
+Verify the update:
+
+```shell
+terraform -version
+```
+
+#### Method 2: Manual Update
+
+If you installed Terraform manually:
+
+1. **Download the Latest Version**:
+   - Visit the [Terraform download page](https://www.terraform.io/downloads.html)
+   - Download the latest macOS version (for Apple Silicon: darwin_arm64)
+
+2. **Replace the Existing Binary**:
+   ```shell
+   # Backup current version (optional)
+   sudo mv /usr/local/bin/terraform /usr/local/bin/terraform.backup
+   
+   # Extract and move new version
+   unzip ~/Downloads/terraform_1.13.3_darwin_arm64.zip
+   sudo mv terraform /usr/local/bin/
+   sudo chmod +x /usr/local/bin/terraform
+   ```
+
+3. **Verify the Update**:
+   ```shell
+   terraform -version
+   ```
+
+### Updating Terraform on Windows
+
+#### Method 1: Using Chocolatey (Recommended)
+
+If you have Chocolatey package manager installed, updating is simple:
+
+```shell
+choco upgrade terraform
+```
+
+If you don't have Chocolatey, you can install it first:
+
+1. **Install Chocolatey**:
+   - Open **PowerShell as Administrator**
+   - Run the following command:
+   ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+   ```
+
+2. **Install/Update Terraform**:
+   ```shell
+   choco install terraform
+   # or if already installed:
+   choco upgrade terraform
+   ```
+
+#### Method 2: Using Scoop (Alternative Package Manager)
+
+If you prefer Scoop package manager:
+
+```shell
+# Install Scoop if not already installed
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+# Add HashiCorp bucket and install/update Terraform
+scoop bucket add hashicorp https://github.com/ScoopInstaller/Scoop-Extras
+scoop install hashicorp/terraform
+# or update if already installed:
+scoop update terraform
+```
+
+#### Method 3: Manual Update
+
+If you installed Terraform manually:
+
+1. **Check Current Installation Location**:
+   - Open **Command Prompt** and run:
+   ```shell
+   where terraform
+   ```
+   - This will show you where `terraform.exe` is currently located (likely `C:\terraform\terraform.exe`)
+
+2. **Download the Latest Version**:
+   - Visit the [Terraform download page](https://www.terraform.io/downloads.html)
+   - Download the latest Windows version (64-bit or 32-bit based on your system)
+
+3. **Backup Current Version** (Optional):
+   ```shell
+   copy C:\terraform\terraform.exe C:\terraform\terraform_backup.exe
+   ```
+
+4. **Replace the Existing Binary**:
+   - Extract the downloaded ZIP file
+   - Replace the existing `terraform.exe` in your installation directory:
+   ```shell
+   # Navigate to your Downloads folder
+   cd %USERPROFILE%\Downloads
+   
+   # Extract and copy (adjust path as needed)
+   move terraform.exe C:\terraform\terraform.exe
+   ```
+
+5. **Verify the Update**:
+   ```shell
+   terraform -version
+   ```
+
+#### Method 4: Using Windows Package Manager (winget)
+
+If you have Windows Package Manager (winget) available:
+
+```shell
+# Install if not already installed
+winget install Hashicorp.Terraform
+
+# Update if already installed
+winget upgrade Hashicorp.Terraform
+```
+
+### Version Management with tfenv (Advanced)
+
+For managing multiple Terraform versions, consider using `tfenv`:
+
+#### Install tfenv on macOS
+
+```shell
+brew install tfenv
+```
+
+#### Using tfenv
+
+```shell
+# List available versions
+tfenv list-remote
+
+# Install latest version
+tfenv install latest
+
+# Install specific version
+tfenv install 1.13.3
+
+# Use specific version
+tfenv use 1.13.3
+
+# Set default version
+tfenv use 1.13.3
+```
+
+### Important Update Considerations
+
+⚠️ **Before updating in production environments:**
+
+1. **Check Compatibility**: Review the [Terraform changelog](https://github.com/hashicorp/terraform/blob/main/CHANGELOG.md) for breaking changes
+2. **Test in Development**: Update your development environment first
+3. **State File Compatibility**: Ensure your state files are compatible with the new version
+4. **Provider Compatibility**: Check that your providers support the new Terraform version
 
 ---
 
-## 4. Troubleshooting
+## 4. Setting Up Visual Studio Code for Terraform Development
+
+Visual Studio Code (VS Code) is the recommended code editor for Terraform development. It provides excellent support for Terraform with syntax highlighting, IntelliSense, and powerful extensions that streamline your infrastructure-as-code workflow.
+
+### Step 1: Install Visual Studio Code
+
+If you don't have VS Code installed:
+
+1. Visit the [Visual Studio Code download page](https://code.visualstudio.com/)
+2. Download the appropriate version for your operating system
+3. Follow the installation instructions for your platform
+
+### Step 2: Install Essential Terraform Extensions
+
+After installing VS Code, you'll want to install these essential extensions for Terraform development:
+
+#### 1. HashiCorp Terraform Extension (Recommended)
+
+This is the official Terraform extension from HashiCorp.
+
+**Installation:**
+1. Open VS Code
+2. Click on the Extensions icon in the sidebar (or press `Ctrl+Shift+X` / `Cmd+Shift+X`)
+3. Search for "HashiCorp Terraform"
+4. Click **Install** on the extension by HashiCorp
+
+**Features:**
+- Syntax highlighting and error highlighting
+- IntelliSense and auto-completion
+- Code formatting with `terraform fmt`
+- Integration with Terraform CLI commands
+- Validation and linting
+- Hover documentation
+- Go to definition and references
+
+#### 2. Terraform Autocomplete Extension
+
+**Installation:**
+1. In VS Code Extensions marketplace
+2. Search for "Terraform"
+3. Install "Terraform" by Anton Kulikov
+
+**Features:**
+- Enhanced autocomplete for Terraform configurations
+- Resource and data source suggestions
+- Variable and output completion
+
+#### 3. Azure Terraform Extension (Optional for Azure resources)
+
+If you plan to work with Azure resources alongside GCP:
+
+**Installation:**
+1. Search for "Azure Terraform" in Extensions
+2. Install the extension by Microsoft
+
+
+## 5. Next Steps
+
+With Terraform installed and VS Code configured, you're ready to start defining and deploying infrastructure on Google Cloud Platform (GCP). Here are your next steps:
+
+- **Configure GCP Credentials**: Terraform will need access to your GCP credentials to manage resources.
+- **Create Your First Terraform Project**: Start with simple GCP configurations to get familiar with the syntax and workflow.
+- **Learn Terraform Best Practices**: Understand state management, modules, and workspace organization.
+
+---
+
+## 6. Troubleshooting
+
+### Terraform Installation Issues
 
 - **Command Not Found**: If running `terraform -v` returns a "command not found" error:
   - Ensure that the Terraform executable is in your system's `PATH`.
@@ -185,11 +436,29 @@ With Terraform installed, you're ready to start defining and deploying infrastru
   - On macOS and Linux, you may need to use `sudo` when moving files to system directories.
   - Ensure you have administrative privileges during installation.
 
+### VS Code Extension Issues
+
+- **Extension Not Working**: If Terraform extensions aren't providing features:
+  - Restart VS Code after installing extensions
+  - Check that files have the correct `.tf` extension
+  - Verify Terraform is installed and accessible from terminal
+  - Check VS Code's Output panel for extension error messages
+
+- **Formatting Not Working**: If auto-formatting isn't working:
+  - Ensure the HashiCorp Terraform extension is set as the default formatter
+  - Check that `terraform fmt` command works in terminal
+  - Verify the settings configuration is applied correctly
+
+- **IntelliSense Issues**: If auto-completion isn't working:
+  - Make sure you're working in a valid Terraform project directory
+  - Check that the extension can access Terraform CLI
+  - Try reloading the VS Code window (`Ctrl+Shift+P` → "Developer: Reload Window")
+
 ---
 
-## 5. Conclusion
+## 7. Conclusion
 
-You've successfully installed Terraform on your system. This foundational setup enables you to begin automating your GCP infrastructure deployments. Terraform's declarative approach will help you manage resources efficiently and consistently across your Google Cloud environments.
+You've successfully installed Terraform and set up Visual Studio Code with essential extensions for Terraform development. This powerful combination provides you with an optimal development environment for automating your GCP infrastructure deployments. Terraform's declarative approach, combined with VS Code's intelligent features, will help you manage resources efficiently and consistently across your Google Cloud environments.
 
 ---
 
@@ -200,3 +469,5 @@ You've successfully installed Terraform on your system. This foundational setup 
 - terraform
 - gcp
 - infrastructure-as-code
+- vscode
+- development-environment
