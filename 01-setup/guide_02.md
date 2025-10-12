@@ -14,7 +14,7 @@
 5. Accept the terms of service
 6. Click **"Start my free trial"**
 
-![](/Users/lotfinejad/terraform_projects/terraform-gcp-guide/01-setup/images/01.png)
+![](./images/01.png)
 
 **Result:** You now have a GCP account with $300 in free credits valid for 90 days.
 
@@ -28,21 +28,21 @@
 2. Click on **"APIs & Services"**
 3. Select **"Library"** or **"Enable APIs and Services"**
 
-![image-20251012175320176](/Users/lotfinejad/terraform_projects/terraform-gcp-guide/01-setup/images/02.png)
+![image-20251012175320176](./images/02.png)
 
 ### Step 2.2: Search for Compute Engine API
 
 1. In the search bar, type **"Compute Engine API"**
 2. Click on **"Compute Engine API"** from the results
 
-![image-20251012175335477](/Users/lotfinejad/terraform_projects/terraform-gcp-guide/01-setup/images/03.png)
+![image-20251012175335477](./images/03.png)
 
 ### Step 2.3: Enable the API
 
 1. Click the **"ENABLE"** button
 2. Wait for the API to be enabled (takes a few seconds)
 
-![image-20251012175246748](/Users/lotfinejad/terraform_projects/terraform-gcp-guide/01-setup/images/04.png)
+![image-20251012175246748](./images/04.png)
 
 **Result:** The Compute Engine API is now enabled for your project.
 
@@ -65,7 +65,7 @@
 3. Add an optional **description** (e.g., "Service account for Terraform")
 4. Click **"CREATE AND CONTINUE"**
 
-![image-20251012175451940](/Users/lotfinejad/terraform_projects/terraform-gcp-guide/01-setup/images/05.png)
+![image-20251012175451940](./images/05.png)
 
 ------
 
@@ -82,7 +82,7 @@
 
 **Result:** Your service account is now created with the specified permissions.
 
-![Screenshot 2025-10-12 at 6.05.04 PM](/Users/lotfinejad/terraform_projects/terraform-gcp-guide/01-setup/images/06.png)
+![Screenshot 2025-10-12 at 6.05.04 PM](./images/06.png)
 
 ------
 
@@ -92,7 +92,7 @@
 2. Click the **three vertical dots (⋮)** under the **"Actions"** column
 3. Select **"Manage keys"** from the dropdown menu
 
-![image-20251012175705109](/Users/lotfinejad/terraform_projects/terraform-gcp-guide/01-setup/images/07.png)
+![image-20251012175705109](./images/07.png)
 
 ------
 
