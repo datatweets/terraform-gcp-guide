@@ -357,7 +357,321 @@ tfenv use 1.13.3
 
 ---
 
-## 4. Setting Up Visual Studio Code for Terraform Development
+## 4. Installing and Configuring Google Cloud SDK (gcloud CLI)
+
+The Google Cloud SDK (gcloud CLI) is essential for authenticating with GCP and managing cloud resources. While Terraform can use service account JSON keys, the gcloud CLI provides additional authentication methods and is invaluable for testing and troubleshooting your GCP infrastructure.
+
+### Why Install gcloud CLI?
+
+- **Authentication**: Provides Application Default Credentials (ADC) for Terraform
+- **Project Management**: Easy project switching and configuration
+- **Testing**: Verify GCP resources and permissions before running Terraform
+- **Troubleshooting**: Debug and inspect your GCP infrastructure
+- **Integration**: Works seamlessly with Terraform and other GCP tools
+
+### Installing gcloud CLI on Windows
+
+#### Step 1: Download the Installer
+
+1. Visit the [Google Cloud SDK download page](https://cloud.google.com/sdk/docs/install)
+2. Download the **Google Cloud SDK installer** for Windows
+3. Run the downloaded installer (`.exe` file)
+
+#### Step 2: Run the Installation
+
+1. Follow the installation wizard prompts
+2. When asked, check the following options:
+   - ☑ **Install Google Cloud SDK**
+   - ☑ **Start Google Cloud SDK Shell**
+   - ☑ **Run 'gcloud init'**
+3. Complete the installation
+
+#### Step 3: Verify Installation
+
+Open **Command Prompt** or **PowerShell** and run:
+
+```shell
+gcloud --version
+```
+
+You should see output showing the gcloud version and components.
+
+### Installing gcloud CLI on macOS
+
+#### Method 1: Using Homebrew (Recommended)
+
+```shell
+# Install gcloud CLI
+brew install --cask google-cloud-sdk
+
+# Verify installation
+gcloud --version
+```
+
+#### Method 2: Interactive Installer
+
+1. Download the installer:
+
+```shell
+# For macOS (Apple Silicon - M1/M2/M3)
+curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-darwin-arm.tar.gz
+
+# For macOS (Intel)
+curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-darwin-x86_64.tar.gz
+```
+
+2. Extract and install:
+
+```shell
+# Extract the archive
+tar -xzf google-cloud-cli-darwin-arm.tar.gz
+
+# Run the install script
+./google-cloud-sdk/install.sh
+
+# Initialize your configuration (optional at this point)
+./google-cloud-sdk/bin/gcloud init
+```
+
+3. Update your shell configuration:
+
+```shell
+# Add to PATH (the installer will prompt you)
+source ~/.zshrc  # or source ~/.bash_profile
+```
+
+4. Verify installation:
+
+```shell
+gcloud --version
+```
+
+### Initializing gcloud CLI
+
+After installation, initialize the gcloud CLI to configure your settings:
+
+```shell
+gcloud init
+```
+
+This will:
+1. Open a browser for authentication
+2. Prompt you to select or create a GCP project
+3. Configure default compute region and zone
+
+**Follow the prompts:**
+
+```text
+Welcome! This command will take you through the configuration of gcloud.
+
+Pick configuration to use:
+ [1] Re-initialize this configuration [default] with new settings
+ [2] Create a new configuration
+Please enter your numeric choice: 1
+
+Choose the account you would like to use to perform operations:
+ [1] your-email@example.com
+ [2] Log in with a new account
+Please enter your numeric choice: 1
+
+Pick cloud project to use:
+ [1] your-project-id
+ [2] Create a new project
+Please enter numeric choice or project ID: 1
+
+Do you want to configure a default Compute Region and Zone? (Y/n)? Y
+```
+
+### Authenticating for Terraform
+
+For Terraform to authenticate with GCP using your gcloud credentials, run:
+
+```shell
+gcloud auth application-default login
+```
+
+This command:
+- Opens your browser for authentication
+- Creates Application Default Credentials (ADC)
+- Stores credentials that Terraform can automatically use
+
+**Where credentials are stored:**
+- **Windows**: `%APPDATA%\gcloud\application_default_credentials.json`
+- **macOS/Linux**: `~/.config/gcloud/application_default_credentials.json`
+
+### Essential gcloud Commands for GCP Development
+
+#### Check Authentication Status
+
+```shell
+# List authenticated accounts
+gcloud auth list
+
+# Show current configuration
+gcloud config list
+```
+
+#### Project Management
+
+```shell
+# List all projects
+gcloud projects list
+
+# Set default project
+gcloud config set project PROJECT_ID
+
+# Get current project
+gcloud config get-value project
+```
+
+#### Set Default Region and Zone
+
+```shell
+# Set default region
+gcloud config set compute/region us-central1
+
+# Set default zone
+gcloud config set compute/zone us-central1-a
+
+# View current settings
+gcloud config list
+```
+
+#### Service Account Management
+
+```shell
+# List service accounts
+gcloud iam service-accounts list
+
+# Create a service account
+gcloud iam service-accounts create terraform-sa \
+    --display-name="Terraform Service Account"
+
+# Grant roles to service account
+gcloud projects add-iam-policy-binding PROJECT_ID \
+    --member="serviceAccount:terraform-sa@PROJECT_ID.iam.gserviceaccount.com" \
+    --role="roles/editor"
+```
+
+#### Enable APIs
+
+```shell
+# Enable Compute Engine API
+gcloud services enable compute.googleapis.com
+
+# Enable Cloud Storage API
+gcloud services enable storage.googleapis.com
+
+# List enabled services
+gcloud services list --enabled
+```
+
+### Configuring Terraform to Use gcloud Credentials
+
+#### Method 1: Application Default Credentials (Recommended for Development)
+
+After running `gcloud auth application-default login`, Terraform will automatically use these credentials. No additional configuration needed in your Terraform code:
+
+```hcl
+# provider.tf
+provider "google" {
+  project = "your-project-id"
+  region  = "us-central1"
+}
+```
+
+#### Method 2: Service Account Key File
+
+If using a service account JSON key:
+
+```hcl
+# provider.tf
+provider "google" {
+  credentials = file("~/.gcp/terraform-key.json")
+  project     = "your-project-id"
+  region      = "us-central1"
+}
+```
+
+#### Method 3: Environment Variables
+
+```shell
+# Set the credentials file path
+export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.gcp/terraform-key.json"
+
+# Set the project ID
+export GOOGLE_PROJECT="your-project-id"
+
+# Set the region
+export GOOGLE_REGION="us-central1"
+```
+
+### Verifying Your Setup
+
+Test your gcloud and GCP connectivity:
+
+```shell
+# Verify authentication
+gcloud auth list
+
+# Check current project
+gcloud config get-value project
+
+# Test API access (list compute instances)
+gcloud compute instances list
+
+# Check enabled APIs
+gcloud services list --enabled
+```
+
+### Updating gcloud CLI
+
+Keep your gcloud CLI up to date:
+
+```shell
+# Update all components
+gcloud components update
+
+# Check for available updates
+gcloud components list
+```
+
+### Common gcloud CLI Issues and Solutions
+
+#### Issue: Command not found
+
+**Solution:**
+- **Windows**: Restart your terminal or run the Cloud SDK Shell
+- **macOS**: Add gcloud to PATH or run `source ~/.zshrc`
+
+#### Issue: Authentication errors
+
+**Solution:**
+```shell
+# Re-authenticate
+gcloud auth login
+
+# Re-initialize application default credentials
+gcloud auth application-default login
+
+# Verify credentials
+gcloud auth list
+```
+
+#### Issue: Wrong project selected
+
+**Solution:**
+```shell
+# List available projects
+gcloud projects list
+
+# Switch to correct project
+gcloud config set project YOUR_PROJECT_ID
+```
+
+---
+
+## 5. Setting Up Visual Studio Code for Terraform Development
 
 Visual Studio Code (VS Code) is the recommended code editor for Terraform development. It provides excellent support for Terraform with syntax highlighting, IntelliSense, and powerful extensions that streamline your infrastructure-as-code workflow.
 
@@ -413,17 +727,20 @@ If you plan to work with Azure resources alongside GCP:
 2. Install the extension by Microsoft
 
 
-## 5. Next Steps
+## 6. Next Steps
 
-With Terraform installed and VS Code configured, you're ready to start defining and deploying infrastructure on Google Cloud Platform (GCP). Here are your next steps:
+With Terraform, gcloud CLI, and VS Code all configured, you're ready to start defining and deploying infrastructure on Google Cloud Platform (GCP). Here are your next steps:
 
-- **Configure GCP Credentials**: Terraform will need access to your GCP credentials to manage resources.
-- **Create Your First Terraform Project**: Start with simple GCP configurations to get familiar with the syntax and workflow.
-- **Learn Terraform Best Practices**: Understand state management, modules, and workspace organization.
+- **Authenticate with GCP**: Ensure you've run `gcloud auth application-default login` for Terraform authentication
+- **Create a GCP Project**: Use the GCP Console or `gcloud projects create` to set up your project
+- **Enable Required APIs**: Enable Compute Engine, Cloud Storage, and other APIs you'll need
+- **Create Your First Terraform Project**: Start with simple GCP resources like Cloud Storage buckets or Compute Engine instances
+- **Learn Terraform Best Practices**: Understand state management, modules, and workspace organization
+- **Explore GCP Services**: Familiarize yourself with GCP's offerings and how to provision them with Terraform
 
 ---
 
-## 6. Troubleshooting
+## 7. Troubleshooting
 
 ### Terraform Installation Issues
 
@@ -456,9 +773,23 @@ With Terraform installed and VS Code configured, you're ready to start defining 
 
 ---
 
-## 7. Conclusion
+## 8. Conclusion
 
-You've successfully installed Terraform and set up Visual Studio Code with essential extensions for Terraform development. This powerful combination provides you with an optimal development environment for automating your GCP infrastructure deployments. Terraform's declarative approach, combined with VS Code's intelligent features, will help you manage resources efficiently and consistently across your Google Cloud environments.
+You've successfully set up a complete development environment for Terraform on GCP! You now have:
+
+- ✅ **Terraform installed** and up to date
+- ✅ **Google Cloud SDK (gcloud CLI)** configured and authenticated
+- ✅ **Visual Studio Code** with essential Terraform extensions
+- ✅ **Complete toolchain** for GCP infrastructure automation
+
+This powerful combination provides you with an optimal development environment for automating your GCP infrastructure deployments. Terraform's declarative approach, combined with gcloud CLI's management capabilities and VS Code's intelligent features, will help you manage resources efficiently and consistently across your Google Cloud environments.
+
+### Continue Your Journey
+
+1. **Configure GCP Credentials**: Follow the GCP service account setup guide
+2. **Create Your First Terraform Project**: Start with a simple GCP resource
+3. **Learn Terraform Best Practices**: Explore state management and modules
+4. **Practice with GCP Resources**: Deploy Compute Engine instances, Cloud Storage, and more
 
 ---
 
@@ -471,3 +802,5 @@ You've successfully installed Terraform and set up Visual Studio Code with essen
 - infrastructure-as-code
 - vscode
 - development-environment
+- gcloud-cli
+- google-cloud-sdk
